@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVIZ — Architectural Visualization</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #0e0e0e;
+    --off-white: #f5f2ed;
+    --warm-gray: #9a9690;
+    --accent: #c8a96e;
+    --accent-light: #e8dcc8;
+    --border: rgba(150,144,136,0.2);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--ink);
+    color: var(--off-white);
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    background: linear-gradient(to bottom, rgba(14,14,14,0.95) 0%, rgba(14,14,14,0) 100%);
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--off-white);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .logo span { color: var(--accent); }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+  }
+
+  nav a {
+    color: var(--warm-gray);
+    text-decoration: none;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  nav a:hover { color: var(--off-white); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 3rem 6rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    margin-bottom: 2rem;
+    color: var(--off-white);
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-desc {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--warm-gray);
+    max-width: 380px;
+    margin-bottom: 3rem;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 0.85rem 2rem;
+    background: var(--accent);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: background 0.3s, transform 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); }
+
+  .btn-ghost {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    transition: color 0.3s, border-color 0.3s;
+  }
+
+  .btn-ghost:hover { color: var(--off-white); border-color: var(--warm-gray); }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-image-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: 60% 40%;
+    gap: 3px;
+  }
+
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: #1a1816;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #1a1816;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: #3a3836;
+  }
+
+  .hero-img-placeholder .ph-icon {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #3a3836;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+
+  .hero-img-placeholder p {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .hero-bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+    height: 100%;
+  }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    padding: 1rem 0;
+    background: rgba(200,169,110,0.03);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+
+  .marquee-track span {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+  }
+
+  .marquee-track .dot {
+    color: var(--accent);
+    letter-spacing: 0;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* SERVICES */
+  .services {
+    padding: 7rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-top: 0.4rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .service-card {
+    padding: 2rem;
+    border: 1px solid var(--border);
+    transition: border-color 0.3s;
+    cursor: default;
+  }
+
+  .service-card:hover { border-color: var(--accent); }
+
+  .service-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--accent);
+    opacity: 0.4;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .service-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    color: var(--off-white);
+  }
+
+  .service-desc {
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--warm-gray);
+  }
+
+  /* PORTFOLIO */
+  .portfolio {
+    padding: 7rem 3rem;
+  }
+
+  .portfolio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--off-white);
+  }
+
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 3px;
+  }
+
+  .portfolio-item {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: #1a1816;
+  }
+
+  .portfolio-item img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Give each cell an explicit aspect ratio via padding-top trick */
+  .portfolio-item::before {
+    content: '';
+    display: block;
+  }
+
+  /* Row 1 — 1 wide + 2 portrait */
+  .portfolio-item:nth-child(1)  { grid-column: span 6; }
+  .portfolio-item:nth-child(1)::before { padding-top: 62%; }
+  .portfolio-item:nth-child(2)  { grid-column: span 3; }
+  .portfolio-item:nth-child(2)::before { padding-top: 125%; }
+  .portfolio-item:nth-child(3)  { grid-column: span 3; }
+  .portfolio-item:nth-child(3)::before { padding-top: 125%; }
+
+  /* Row 2 — 3 equal squares */
+  .portfolio-item:nth-child(4)  { grid-column: span 4; }
+  .portfolio-item:nth-child(4)::before { padding-top: 75%; }
+  .portfolio-item:nth-child(5)  { grid-column: span 4; }
+  .portfolio-item:nth-child(5)::before { padding-top: 75%; }
+  .portfolio-item:nth-child(6)  { grid-column: span 4; }
+  .portfolio-item:nth-child(6)::before { padding-top: 75%; }
+
+  /* Row 3 — 2 portrait + 1 wide */
+  .portfolio-item:nth-child(7)  { grid-column: span 3; }
+  .portfolio-item:nth-child(7)::before { padding-top: 120%; }
+  .portfolio-item:nth-child(8)  { grid-column: span 3; }
+  .portfolio-item:nth-child(8)::before { padding-top: 120%; }
+  .portfolio-item:nth-child(9)  { grid-column: span 6; }
+  .portfolio-item:nth-child(9)::before { padding-top: 60%; }
+
+  /* Row 4 — wide + 2 small */
+  .portfolio-item:nth-child(10) { grid-column: span 8; }
+  .portfolio-item:nth-child(10)::before { padding-top: 50%; }
+  .portfolio-item:nth-child(11) { grid-column: span 4; }
+  .portfolio-item:nth-child(11)::before { padding-top: 50%; }
+  .portfolio-item:nth-child(12) { grid-column: span 12; }
+  .portfolio-item:nth-child(12)::before { padding-top: 33%; }
+
+  /* Hidden row 5 — varied */
+  .portfolio-item:nth-child(13) { grid-column: span 4; }
+  .portfolio-item:nth-child(13)::before { padding-top: 75%; }
+  .portfolio-item:nth-child(14) { grid-column: span 4; }
+  .portfolio-item:nth-child(14)::before { padding-top: 75%; }
+  .portfolio-item:nth-child(15) { grid-column: span 4; }
+  .portfolio-item:nth-child(15)::before { padding-top: 75%; }
+  .portfolio-item:nth-child(16) { grid-column: span 6; }
+  .portfolio-item:nth-child(16)::before { padding-top: 62%; }
+  .portfolio-item:nth-child(17) { grid-column: span 3; }
+  .portfolio-item:nth-child(17)::before { padding-top: 120%; }
+  .portfolio-item:nth-child(18) { grid-column: span 3; }
+  .portfolio-item:nth-child(18)::before { padding-top: 120%; }
+
+  .portfolio-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .portfolio-img-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: inherit;
+    background: linear-gradient(135deg, #1a1816 0%, #222018 50%, #1a1816 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.75rem;
+    color: #3a3836;
+    position: relative;
+  }
+
+  .portfolio-img-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 60px,
+      rgba(200,169,110,0.02) 60px,
+      rgba(200,169,110,0.02) 61px
+    );
+  }
+
+  .ph-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #4a4844;
+    z-index: 1;
+  }
+
+  .ph-icon-lg {
+    width: 48px;
+    height: 48px;
+    border: 1px solid #2a2826;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .portfolio-item:hover .portfolio-img { transform: scale(1.04); }
+
+  .portfolio-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(14,14,14,0.85) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
+  }
+
+  .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+
+  /* LIGHTBOX */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(8,8,8,0.96);
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+
+  .lightbox.active { display: flex; }
+
+  .lightbox-img {
+    max-width: 92vw;
+    max-height: 90vh;
+    object-fit: contain;
+    display: block;
+    cursor: default;
+    animation: lbFadeIn 0.25s ease;
+  }
+
+  @keyframes lbFadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .lightbox-close {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(150,144,136,0.3);
+    background: none;
+    color: var(--warm-gray);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, color 0.2s;
+    z-index: 1001;
+  }
+
+  .lightbox-close:hover { border-color: var(--accent); color: var(--off-white); }
+
+  .lightbox-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(150,144,136,0.3);
+    background: none;
+    color: var(--warm-gray);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, color 0.2s;
+    z-index: 1001;
+  }
+
+  .lightbox-arrow:hover { border-color: var(--accent); color: var(--off-white); }
+  .lightbox-arrow.prev { left: 1.5rem; }
+  .lightbox-arrow.next { right: 1.5rem; }
+
+  .lightbox-counter {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--warm-gray);
+    z-index: 1001;
+  }
+
+  .portfolio-meta { }
+  .portfolio-meta span {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+  .portfolio-meta h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 1.2rem;
+    color: var(--off-white);
+  }
+
+  /* PROCESS */
+  .process {
+    padding: 7rem 3rem;
+    background: #0a0a0a;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .process-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 5rem;
+  }
+
+  .process-desc {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--warm-gray);
+    align-self: end;
+  }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+  }
+
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 1.25rem;
+    left: calc(12.5% + 1rem);
+    right: calc(12.5% + 1rem);
+    height: 1px;
+    background: var(--border);
+  }
+
+  .process-step {
+    padding: 0 1.5rem 0 0;
+    position: relative;
+  }
+
+  .step-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .step-title {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    color: var(--off-white);
+  }
+
+  .step-desc {
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: var(--warm-gray);
+  }
+
+  /* STATS */
+  .stats {
+    padding: 5rem 3rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    padding: 2rem 3rem 2rem 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat:last-child { border-right: none; padding-left: 3rem; padding-right: 0; }
+  .stat:not(:first-child) { padding-left: 3rem; }
+
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--off-white);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-num span { color: var(--accent); font-size: 2rem; }
+
+  .stat-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+  }
+
+  /* PRICING */
+  .pricing {
+    padding: 7rem 3rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pricing-header { margin-bottom: 3rem; }
+
+  .pricing-desc {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--warm-gray);
+    margin-top: 1rem;
+  }
+
+  .price-table-wrap { overflow-x: auto; }
+
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .price-table thead tr {
+    border-bottom: 1px solid var(--accent);
+  }
+
+  .price-table th {
+    text-align: left;
+    padding: 0 1rem 1rem 0;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    font-weight: 400;
+  }
+
+  .price-table td {
+    padding: 1rem 1rem 1rem 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--warm-gray);
+    vertical-align: top;
+  }
+
+  .price-table td:first-child {
+    color: var(--off-white);
+    font-weight: 400;
+    white-space: nowrap;
+    padding-right: 2rem;
+  }
+
+  .price-table td:last-child {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: var(--accent);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .price-table-note td {
+    color: var(--warm-gray);
+    opacity: 0.6;
+  }
+
+  .price-note {
+    margin-top: 2rem;
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--warm-gray);
+    max-width: 600px;
+  }
+
+  @media (max-width: 900px) {
+    .pricing { padding: 4rem 1.5rem; }
+    .price-table td:first-child { white-space: normal; }
+  }
+
+  /* CONTACT */
+  .contact {
+    padding: 7rem 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+  }
+
+  .contact-left h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-left p {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--warm-gray);
+    margin-bottom: 2.5rem;
+    max-width: 400px;
+  }
+
+  .contact-detail {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.82rem;
+    color: var(--warm-gray);
+  }
+
+  .contact-detail strong {
+    color: var(--off-white);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .form-group label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: #161614;
+    border: 1px solid var(--border);
+    color: var(--off-white);
+    padding: 0.75rem 1rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.3s;
+    width: 100%;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .form-group select option { background: #161614; }
+
+  .form-group textarea { resize: vertical; min-height: 120px; }
+
+  .file-upload {
+    border: 1px dashed rgba(150,144,136,0.4);
+    transition: border-color 0.3s;
+  }
+
+  .file-upload:hover { border-color: var(--accent); }
+  .file-upload.dragover { border-color: var(--accent); background: rgba(200,169,110,0.04); }
+
+  .file-upload-inner {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .file-upload-text {
+    font-size: 0.82rem;
+    color: var(--warm-gray);
+    margin-bottom: 0.25rem;
+  }
+
+  .file-upload-hint {
+    font-size: 0.7rem;
+    color: #5a5854;
+    letter-spacing: 0.05em;
+  }
+
+  .file-list {
+    padding: 0 1rem;
+  }
+
+  .file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--warm-gray);
+  }
+
+  .file-item span { color: var(--off-white); }
+
+  .file-remove {
+    background: none;
+    border: none;
+    color: var(--warm-gray);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 0.25rem;
+    transition: color 0.2s;
+  }
+
+  .file-remove:hover { color: var(--off-white); }
+
+  .form-submit {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: var(--accent);
+    color: var(--ink);
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s;
+    align-self: flex-start;
+  }
+
+  .form-submit:hover { background: var(--accent-light); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer p {
+    font-size: 0.72rem;
+    color: var(--warm-gray);
+    letter-spacing: 0.05em;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .footer-links a {
+    font-size: 0.72rem;
+    color: var(--warm-gray);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover { color: var(--off-white); }
+
+  /* LIGHTBOX */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(10,10,10,0.96);
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+
+  .lightbox.active { display: flex; }
+
+  .lightbox-img {
+    max-width: 92vw;
+    max-height: 90vh;
+    object-fit: contain;
+    display: block;
+    cursor: default;
+    transition: opacity 0.2s;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 2rem;
+    background: none;
+    border: none;
+    color: var(--warm-gray);
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+    z-index: 1001;
+  }
+
+  .lightbox-close:hover { color: var(--off-white); }
+
+  .lightbox-prev, .lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: 1px solid rgba(150,144,136,0.3);
+    color: var(--warm-gray);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    z-index: 1001;
+  }
+
+  .lightbox-prev { left: 2rem; }
+  .lightbox-next { right: 2rem; }
+  .lightbox-prev:hover, .lightbox-next:hover { border-color: var(--accent); color: var(--off-white); }
+
+  .lightbox-counter {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--warm-gray);
+  }
+
+  .portfolio-hidden { display: none; }
+
+  .btn-load-more {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--warm-gray);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.85rem 2.5rem;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+  }
+
+  .btn-load-more:hover { border-color: var(--accent); color: var(--off-white); }
+
+  /* BEFORE / AFTER */
+  .beforeafter {
+    padding: 7rem 3rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ba-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 3rem;
+    align-items: end;
+  }
+
+  .ba-desc {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: var(--warm-gray);
+  }
+
+  .ba-slider-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/7;
+    overflow: hidden;
+    cursor: col-resize;
+    user-select: none;
+    background: #1a1816;
+  }
+
+  .ba-after, .ba-before {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ba-after img, .ba-before img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+
+  .ba-before {
+    clip-path: inset(0 50% 0 0);
+  }
+
+  .ba-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ba-placeholder-after { background: #222018; }
+  .ba-placeholder-before { background: #1a1816; }
+
+  .ba-divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: var(--accent);
+    transform: translateX(-50%);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .ba-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  }
+
+  .ba-label {
+    position: absolute;
+    bottom: 1.25rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.75rem;
+    background: rgba(14,14,14,0.7);
+    color: var(--off-white);
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .ba-label-before { left: 1.25rem; }
+  .ba-label-after { right: 1.25rem; }
+
+  @media (max-width: 900px) {
+    .beforeafter { padding: 4rem 1.5rem; }
+    .ba-header { grid-template-columns: 1fr; gap: 1.5rem; }
+    .ba-slider-wrap { aspect-ratio: 4/3; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-eyebrow { animation: fadeUp 0.8s ease 0.2s both; }
+  .hero-title { animation: fadeUp 0.8s ease 0.4s both; }
+  .hero-desc { animation: fadeUp 0.8s ease 0.6s both; }
+  .cta-row { animation: fadeUp 0.8s ease 0.8s both; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 1.2rem 1.5rem; }
+    nav ul { display: none; }
+
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 7rem 1.5rem 4rem; }
+
+    .services { grid-template-columns: 1fr; gap: 2rem; padding: 4rem 1.5rem; }
+    .services-grid { grid-template-columns: 1fr; }
+
+    .portfolio { padding: 4rem 1.5rem; }
+    .portfolio-grid { grid-template-columns: repeat(6, 1fr); }
+    .portfolio-item:nth-child(n) { grid-column: span 3; }
+    .portfolio-item:nth-child(n)::before { padding-top: 75%; }
+    .portfolio-item:nth-child(1) { grid-column: span 6; }
+    .portfolio-item:nth-child(1)::before { padding-top: 56%; }
+    .portfolio-item:nth-child(12) { grid-column: span 6; }
+    .portfolio-item:nth-child(12)::before { padding-top: 56%; }
+
+    .process { padding: 4rem 1.5rem; }
+    .process-header { grid-template-columns: 1fr; gap: 1.5rem; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    .process-steps::before { display: none; }
+
+    .stats { grid-template-columns: 1fr 1fr; padding: 3rem 1.5rem; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); padding: 1.5rem 0; }
+    .stat:last-child { border-bottom: none; }
+    .stat:not(:first-child) { padding-left: 0; }
+
+    .contact { grid-template-columns: 1fr; gap: 3rem; padding: 4rem 1.5rem; }
+    .form-row { grid-template-columns: 1fr; }
+
+    footer { flex-direction: column; gap: 1rem; padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">nviz<span>.</span>space</a>
+  <ul>
+    <li><a href="#portfolio">Work</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">nviz.space — Architectural Visualization</p>
+    <h1 class="hero-title">Visualise<br>your <em>space</em></h1>
+    <p class="hero-desc">Photorealistic interior and exterior renders for architects, designers, and real estate agencies. Delivered in 4–6 business days.</p>    <div class="cta-row">
+      <a href="#contact" class="btn-primary">Start a project</a>
+      <a href="#portfolio" class="btn-ghost">View work</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-image-grid">
+      <div class="hero-img">
+        <img src="img12.webp" style="width:100%;height:100%;object-fit:cover;display:block;">
+      </div>
+      <div class="hero-bottom-row">
+        <div class="hero-img">
+          <img src="img13.webp" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </div>
+        <div class="hero-img">
+          <img src="img6.webp" style="width:100%;height:100%;object-fit:cover;display:block;">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>Interior Renders</span><span class="dot">·</span>
+    <span>Exterior Visualization</span><span class="dot">·</span>
+    <span>Material & Texture Variations</span><span class="dot">·</span>
+    <span>Object Inpainting</span><span class="dot">·</span>
+    <span>Render Enhancement</span><span class="dot">·</span>
+    <span>4–6 Day Turnaround</span><span class="dot">·</span>
+    <span>Interior Renders</span><span class="dot">·</span>
+    <span>Exterior Visualization</span><span class="dot">·</span>
+    <span>Material & Texture Variations</span><span class="dot">·</span>
+    <span>Object Inpainting</span><span class="dot">·</span>
+    <span>Render Enhancement</span><span class="dot">·</span>
+    <span>4–6 Day Turnaround</span><span class="dot">·</span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div>
+    <p class="section-label">What we offer</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-num">01</div>
+      <h3 class="service-title">Interior & Exterior Renders</h3>
+      <p class="service-desc">Photorealistic stills of any space — living rooms, kitchens, facades, landscapes. Delivered ready for client presentations, social media, or planning submissions.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">02</div>
+      <h3 class="service-title">Material & Object Variations</h3>
+      <p class="service-desc">Swap finishes, textures, and furniture across the same scene. Show multiple options in one presentation without rebuilding the scene from scratch.</p>
+    </div>
+    <div class="service-card" style="grid-column: span 2;">
+      <div class="service-num">03</div>
+      <h3 class="service-title">Render Enhancement</h3>
+      <p class="service-desc">Already have a 3D render that looks flat or unconvincing? We take existing renders and transform them into photorealistic images. Better lighting, richer materials, cinematic depth — no re-modeling required.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section class="portfolio" id="portfolio">
+  <div class="portfolio-header">
+    <div>
+      <p class="section-label" style="margin-bottom:0.75rem;">Selected work</p>
+      <h2 class="section-title">Recent<br>projects</h2>
+    </div>
+    <a href="#contact" class="btn-ghost" style="margin-bottom:0.5rem;">Commission a render</a>
+  </div>
+
+  <div class="portfolio-grid" id="portfolioGrid">
+    <div class="portfolio-item"><img src="img1.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img2.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img3.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img4.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img5.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img6.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img7.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img8.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img9.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img10.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img11.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item"><img src="img12.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item portfolio-hidden"><img src="img13.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item portfolio-hidden"><img src="img14.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item portfolio-hidden"><img src="img15.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item portfolio-hidden"><img src="img16.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item portfolio-hidden"><img src="img17.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+    <div class="portfolio-item portfolio-hidden"><img src="img18.webp" class="portfolio-img"><div class="portfolio-overlay"></div></div>
+  </div>
+
+  <div style="text-align:center; margin-top:3rem;">
+    <button class="btn-load-more" id="loadMoreBtn" onclick="loadMore()">Load more</button>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="process">
+  <div class="process-header">
+    <div>
+      <p class="section-label" style="margin-bottom:0.75rem;">How it works</p>
+      <h2 class="section-title">Simple.<br>Fast.<br>Photorealistic.</h2>
+    </div>
+    <p class="process-desc">Most projects delivered within 3–5 days. Material and furniture variations can be turned around faster. No complex briefing forms — just send us your plans and references.</p>
+  </div>
+  <div class="process-steps">
+    <div class="process-step">
+      <div class="step-dot"></div>
+      <p class="step-num">Step 01</p>
+      <h3 class="step-title">Send your brief</h3>
+      <p class="step-desc">Share your floor plans, 3D model, or reference images. The more detail you provide, the closer the first result will be to your vision.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-dot"></div>
+      <p class="step-num">Step 02</p>
+      <h3 class="step-title">Model approval</h3>
+      <p class="step-desc">We send you an unrendered preview of the 3D scene for approval. Once confirmed, the geometry is locked — keeping revisions clean and your project on schedule.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-dot"></div>
+      <p class="step-num">Step 03</p>
+      <h3 class="step-title">Render & refine</h3>
+      <p class="step-desc">We apply lighting, materials, and atmosphere to match your references. One round of style revisions — lighting, mood, time of day — is included.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-dot"></div>
+      <p class="step-num">Step 04</p>
+      <h3 class="step-title">Delivery</h3>
+      <p class="step-desc">High-resolution, camera-ready images delivered in 4–6 business days. Ready for presentations, marketing, and planning submissions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section class="beforeafter" id="enhancement">
+  <div class="ba-header">
+    <div>
+      <p class="section-label" style="margin-bottom:0.75rem;">Render enhancement</p>
+      <h2 class="section-title">From 3D render<br>to <em style="font-family:'Cormorant Garamond',serif;color:var(--accent);">photograph</em></h2>
+    </div>
+    <p class="ba-desc">We take existing 3D renders and transform them into photorealistic images. Better light, richer materials, cinematic depth — no re-modeling required. Drag the slider to see the difference.</p>
+  </div>
+
+  <div class="ba-slider-wrap" id="baSlider">
+    <div class="ba-after">
+      <img src="after.webp" style="width:100%;height:100%;object-fit:cover;display:block;">
+    </div>
+    <div class="ba-before" id="baBefore">
+      <img src="before.webp" style="width:100%;height:100%;object-fit:cover;display:block;">
+    </div>
+    <div class="ba-divider" id="baDivider">
+      <div class="ba-handle">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M7 4L1 10L7 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13 4L19 10L13 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="ba-label ba-label-before">Before</div>
+    <div class="ba-label ba-label-after">After</div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER — EDITING -->
+<section class="beforeafter" id="editing" style="border-top:none;padding-top:0;">
+  <div class="ba-header">
+    <div>
+      <p class="section-label" style="margin-bottom:0.75rem;">Material & object editing</p>
+      <h2 class="section-title">Change anything.<br><em style="font-family:'Cormorant Garamond',serif;color:var(--accent);">Instantly.</em></h2>
+    </div>
+    <p class="ba-desc">Swap furniture, replace textures, change wall colors, add or remove objects — all without touching the original 3D file. Drag the slider to see an editing example.</p>
+  </div>
+
+  <div class="ba-slider-wrap" id="baSlider2">
+    <div class="ba-after">
+      <img src="editafter.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
+    </div>
+    <div class="ba-before" id="baBefore2">
+      <img src="editbefore.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
+    </div>
+    <div class="ba-divider" id="baDivider2">
+      <div class="ba-handle">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M7 4L1 10L7 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13 4L19 10L13 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="ba-label ba-label-before">Before</div>
+    <div class="ba-label ba-label-after">After</div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="stat-num">4–6<span>days</span></div>
+    <p class="stat-label">Average turnaround</p>
+  </div>
+  <div class="stat">
+    <div class="stat-num">1<span>round</span></div>
+    <p class="stat-label">Style revisions included</p>
+  </div>
+  <div class="stat">
+    <div class="stat-num">4K</div>
+    <p class="stat-label">Output resolution</p>
+  </div>
+  <div class="stat">
+    <div class="stat-num">3<span>+</span></div>
+    <p class="stat-label">Services offered</p>
+  </div>
+</div>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-header">
+    <p class="section-label" style="margin-bottom:0.75rem;">Pricing</p>
+    <h2 class="section-title">Starting rates</h2>
+    <p class="pricing-desc">Prices below are for orientation. Every project is different — <a href="#contact" style="color:var(--accent);text-decoration:none;">get in touch</a> for an exact quote.</p>
+  </div>
+  <div class="price-table-wrap">
+    <table class="price-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Description</th>
+          <th>From</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Interior render</td>
+          <td>Photorealistic interior view, lighting & material finish</td>
+          <td>$249</td>
+        </tr>
+        <tr>
+          <td>Exterior render</td>
+          <td>Photorealistic exterior view, generated environment & sky</td>
+          <td>$349</td>
+        </tr>
+        <tr>
+          <td>Site-accurate exterior</td>
+          <td>Exterior background matched to your real location</td>
+          <td>$444</td>
+        </tr>
+        <tr>
+          <td>Full project</td>
+          <td>3 exteriors + 2 interiors, same project</td>
+          <td>$899</td>
+        </tr>
+        <tr>
+          <td>Extra view</td>
+          <td>Additional angle of an existing scene</td>
+          <td>$85</td>
+        </tr>
+        <tr>
+          <td>Render enhancement</td>
+          <td>Photorealistic upgrade of your existing render</td>
+          <td>$80</td>
+        </tr>
+        <tr>
+          <td>Material variation</td>
+          <td>Same scene, different finish or texture</td>
+          <td>$65</td>
+        </tr>
+        <tr class="price-table-note">
+          <td>Large projects</td>
+          <td>Full developments, multiple buildings, ongoing contracts</td>
+          <td>Custom</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="price-note">All renders include one style revision round. Structural changes after model approval are quoted separately. Providing your own 3D model? We include one extra view at no additional cost.</p>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-left">
+    <p class="section-label" style="margin-bottom:1rem;">Get in touch</p>
+    <h2>Let's visualize<br>your next<br><em style="font-family:'Cormorant Garamond',serif; color:var(--accent);">project</em></h2>
+    <p>Tell us what you're working on. We'll get back to you within a few hours with a quote and timeline.</p>
+    <div class="contact-detail">
+      <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c3aaada5ac83adb5aab9edb0b3a2a0a6">[email&#160;protected]</a></strong>
+    </div>
+    <div class="contact-detail">
+      <strong>Responses within 24 hours</strong>
+    </div>
+  </div>
+  <form class="contact-form" name="contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+    <input type="hidden" name="form-name" value="contact">
+    <input type="hidden" name="bot-field" style="display:none;">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Your name</label>
+        <input type="text" placeholder="Alex Chen">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="alex@studio.com">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Project type</label>
+      <select>
+        <option value="">Select a service</option>
+        <option>Interior render — $249</option>
+        <option>Exterior render — $349</option>
+        <option>Full project — $899</option>
+        <option>Render enhancement — $80</option>
+        <option>Material variation — $65</option>
+        <option>Custom / large project quote</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Tell us about your project</label>
+      <textarea placeholder="Describe the space, any references you have, and your timeline..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Attachments — floor plans, references, mood boards</label>
+      <div class="file-upload" id="fileUpload">
+        <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,.dwg,.dxf" style="display:none;">
+        <div class="file-upload-inner" onclick="document.getElementById('fileInput').click()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-bottom:0.5rem;opacity:0.4;">
+            <path d="M10 3v10M6 7l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 14v1a2 2 0 002 2h10a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <p class="file-upload-text">Click to upload or drag and drop</p>
+          <p class="file-upload-hint">JPG, PNG, PDF, DWG up to 20MB each</p>
+        </div>
+        <div id="fileList" class="file-list"></div>
+      </div>
+    </div>
+    <button type="submit" class="form-submit">Send enquiry</button>
+  </form>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 nviz.space. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#portfolio">Work</a>
+    <a href="#services">Services</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">×</button>
+  <button class="lightbox-prev" id="lightboxPrev">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <button class="lightbox-next" id="lightboxNext">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+function loadMore() {
+  const hidden = document.querySelectorAll('.portfolio-hidden');
+  hidden.forEach(function(el) { el.style.display = 'block'; el.classList.remove('portfolio-hidden'); });
+  document.getElementById('loadMoreBtn').style.display = 'none';
+  initLightbox();
+}
+
+(function initLightbox() {
+  window.initLightbox = initLightbox;
+  const lightbox = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  const lbCounter = document.getElementById('lightboxCounter');
+  let images = [];
+  let current = 0;
+
+  function getImages() {
+    return Array.from(document.querySelectorAll('.portfolio-item:not([style*="display: none"]) .portfolio-img'));
+  }
+
+  function open(index) {
+    images = getImages();
+    current = index;
+    lbImg.src = images[current].src;
+    lbCounter.textContent = (current + 1) + ' / ' + images.length;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function prev() {
+    current = (current - 1 + images.length) % images.length;
+    lbImg.src = images[current].src;
+    lbCounter.textContent = (current + 1) + ' / ' + images.length;
+  }
+
+  function next() {
+    current = (current + 1) % images.length;
+    lbImg.src = images[current].src;
+    lbCounter.textContent = (current + 1) + ' / ' + images.length;
+  }
+
+  document.querySelectorAll('.portfolio-item').forEach(function(item, i) {
+    item.addEventListener('click', function() { open(i); });
+  });
+
+  document.getElementById('lightboxClose').addEventListener('click', close);
+  document.getElementById('lightboxPrev').addEventListener('click', function(e) { e.stopPropagation(); prev(); });
+  document.getElementById('lightboxNext').addEventListener('click', function(e) { e.stopPropagation(); next(); });
+  lightbox.addEventListener('click', function(e) { if (e.target === lightbox) close(); });
+
+  document.addEventListener('keydown', function(e) {
+    if (!lightbox.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft') prev();
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
+
+<script>
+(function() {
+  const input = document.getElementById('fileInput');
+  const list = document.getElementById('fileList');
+  const zone = document.getElementById('fileUpload');
+
+  let files = [];
+
+  function renderList() {
+    list.innerHTML = '';
+    files.forEach(function(f, i) {
+      const size = f.size > 1048576 ? (f.size/1048576).toFixed(1) + ' MB' : (f.size/1024).toFixed(0) + ' KB';
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerHTML = '<span>' + f.name + '</span><span style="margin-left:1rem;font-size:0.7rem;">' + size + '</span><button class="file-remove" data-i="' + i + '">×</button>';
+      list.appendChild(item);
+    });
+    list.querySelectorAll('.file-remove').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        files.splice(parseInt(btn.dataset.i), 1);
+        renderList();
+      });
+    });
+  }
+
+  input.addEventListener('change', function() {
+    Array.from(input.files).forEach(function(f) { files.push(f); });
+    renderList();
+    input.value = '';
+  });
+
+  zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', function() { zone.classList.remove('dragover'); });
+  zone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    Array.from(e.dataTransfer.files).forEach(function(f) { files.push(f); });
+    renderList();
+  });
+})();
+</script>
+<script>
+(function() {
+  const slider = document.getElementById('baSlider2');
+  const before = document.getElementById('baBefore2');
+  const divider = document.getElementById('baDivider2');
+  if (!slider) return;
+
+  let dragging = false;
+
+  function setPosition(x) {
+    const rect = slider.getBoundingClientRect();
+    let pct = (x - rect.left) / rect.width;
+    pct = Math.min(Math.max(pct, 0.02), 0.98);
+    before.style.clipPath = 'inset(0 ' + ((1 - pct) * 100).toFixed(2) + '% 0 0)';
+    divider.style.left = (pct * 100).toFixed(2) + '%';
+  }
+
+  slider.addEventListener('mousedown', function(e) { dragging = true; setPosition(e.clientX); });
+  window.addEventListener('mousemove', function(e) { if (dragging) setPosition(e.clientX); });
+  window.addEventListener('mouseup', function() { dragging = false; });
+  slider.addEventListener('touchstart', function(e) { dragging = true; setPosition(e.touches[0].clientX); }, { passive: true });
+  window.addEventListener('touchmove', function(e) { if (dragging) setPosition(e.touches[0].clientX); }, { passive: true });
+  window.addEventListener('touchend', function() { dragging = false; });
+})();
+</script>
+<script>
+(function() {
+  const slider = document.getElementById('baSlider');
+  const before = document.getElementById('baBefore');
+  const divider = document.getElementById('baDivider');
+  if (!slider) return;
+
+  let dragging = false;
+
+  function setPosition(x) {
+    const rect = slider.getBoundingClientRect();
+    let pct = (x - rect.left) / rect.width;
+    pct = Math.min(Math.max(pct, 0.02), 0.98);
+    const right = ((1 - pct) * 100).toFixed(2) + '%';
+    before.style.clipPath = 'inset(0 ' + right + ' 0 0)';
+    divider.style.left = (pct * 100).toFixed(2) + '%';
+  }
+
+  slider.addEventListener('mousedown', function(e) {
+    dragging = true;
+    setPosition(e.clientX);
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    setPosition(e.clientX);
+  });
+
+  window.addEventListener('mouseup', function() { dragging = false; });
+
+  slider.addEventListener('touchstart', function(e) {
+    dragging = true;
+    setPosition(e.touches[0].clientX);
+  }, { passive: true });
+
+  window.addEventListener('touchmove', function(e) {
+    if (!dragging) return;
+    setPosition(e.touches[0].clientX);
+  }, { passive: true });
+
+  window.addEventListener('touchend', function() { dragging = false; });
+})();
+</script>
+</body>
+</html>
