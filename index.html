@@ -805,14 +805,13 @@
     font-size: 0.88rem;
     line-height: 1.8;
     color: var(--warm-gray);
-    margin-bottom: 2.5rem;
     max-width: 400px;
   }
 
   .contact-detail {
     display: flex;
     gap: 1rem;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 1rem;
     font-size: 0.82rem;
     color: var(--warm-gray);
@@ -824,125 +823,79 @@
     letter-spacing: 0.05em;
   }
 
-  .contact-form {
+  .contact-right {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    justify-content: center;
+    gap: 2.5rem;
   }
 
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
-  .form-group {
+  .mailto-btn {
     display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: border-color 0.3s, background 0.3s;
   }
 
-  .form-group label {
+  .mailto-btn:hover {
+    border-color: var(--accent);
+    background: rgba(200,169,110,0.04);
+  }
+
+  .mailto-label {
     font-size: 0.65rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--warm-gray);
+    display: block;
+    margin-bottom: 0.4rem;
   }
 
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    background: #161614;
-    border: 1px solid var(--border);
-    color: var(--off-white);
-    padding: 0.75rem 1rem;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.85rem;
+  .mailto-address {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
     font-weight: 300;
-    outline: none;
-    transition: border-color 0.3s;
-    width: 100%;
+    color: var(--off-white);
+    display: block;
   }
 
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    border-color: var(--accent);
+  .mailto-btn svg { margin-left: auto; color: var(--accent); }
+
+  .hint-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 1rem;
   }
 
-  .form-group select option { background: #161614; }
+  .hint-list { list-style: none; }
 
-  .form-group textarea { resize: vertical; min-height: 120px; }
-
-  .file-upload {
-    border: 1px dashed rgba(150,144,136,0.4);
-    transition: border-color 0.3s;
-  }
-
-  .file-upload:hover { border-color: var(--accent); }
-  .file-upload.dragover { border-color: var(--accent); background: rgba(200,169,110,0.04); }
-
-  .file-upload-inner {
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-  }
-
-  .file-upload-text {
+  .hint-list li {
     font-size: 0.82rem;
     color: var(--warm-gray);
-    margin-bottom: 0.25rem;
-  }
-
-  .file-upload-hint {
-    font-size: 0.7rem;
-    color: #5a5854;
-    letter-spacing: 0.05em;
-  }
-
-  .file-list {
-    padding: 0 1rem;
-  }
-
-  .file-item {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 0;
-    border-top: 1px solid var(--border);
-    font-size: 0.78rem;
-    color: var(--warm-gray);
+    gap: 0.75rem;
   }
 
-  .file-item span { color: var(--off-white); }
-
-  .file-remove {
-    background: none;
-    border: none;
-    color: var(--warm-gray);
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0 0.25rem;
-    transition: color 0.2s;
-  }
-
-  .file-remove:hover { color: var(--off-white); }
-
-  .form-submit {
-    display: inline-block;
-    padding: 1rem 2.5rem;
+  .hint-list li::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
     background: var(--accent);
-    color: var(--ink);
-    border: none;
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.3s;
-    align-self: flex-start;
+    flex-shrink: 0;
   }
 
-  .form-submit:hover { background: var(--accent-light); }
+  @media (max-width: 900px) {
+    .contact { grid-template-columns: 1fr; gap: 3rem; padding: 4rem 1.5rem; }
+  }
 
   /* FOOTER */
   footer {
@@ -1216,7 +1169,6 @@
     .stat:not(:first-child) { padding-left: 0; }
 
     .contact { grid-template-columns: 1fr; gap: 3rem; padding: 4rem 1.5rem; }
-    .form-row { grid-template-columns: 1fr; }
 
     footer { flex-direction: column; gap: 1rem; padding: 1.5rem; }
   }
@@ -1526,61 +1478,32 @@
   <div class="contact-left">
     <p class="section-label" style="margin-bottom:1rem;">Get in touch</p>
     <h2>Let's visualize<br>your next<br><em style="font-family:'Cormorant Garamond',serif; color:var(--accent);">project</em></h2>
-    <p>Tell us what you're working on. We'll get back to you within a few hours with a quote and timeline.</p>
-    <div class="contact-detail">
-      <strong><a href="mailto:info@nviz.space">info@nviz.space</a></strong>
+    <p>Tell us what you're working on and we'll get back to you with a quote and timeline within 24 hours.</p>
+    <div class="contact-detail" style="margin-top:2rem;">
+      <strong><a href="mailto:info@nviz.space" style="color:var(--off-white);text-decoration:none;">info@nviz.space</a></strong>
     </div>
     <div class="contact-detail">
-      <strong>Responses within 24 hours</strong>
+      <strong style="color:var(--warm-gray);font-weight:300;font-size:0.85rem;">When reaching out, feel free to include your floor plans, references, mood boards, or a link to your project. The more detail the better.</strong>
     </div>
   </div>
-  <form class="contact-form" action="https://formspree.io/f/maqazwpe" method="POST">
-    <input type="hidden" name="_subject" value="New project enquiry — nviz.space">
-    <input type="hidden" name="_next" value="https://nviz.space/#contact">
-    <input type="text" name="_gotcha" style="display:none;">
-    <div class="form-row">
-      <div class="form-group">
-        <label>Your name</label>
-        <input type="text" name="name" placeholder="Alex Chen" required>
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" name="email" placeholder="alex@studio.com" required>
-      </div>
+  <div class="contact-right">
+    <a href="mailto:info@nviz.space?subject=Project%20Enquiry%20%E2%80%94%20nviz.space" class="mailto-btn">
+      <span class="mailto-label">Send us an email</span>
+      <span class="mailto-address">info@nviz.space</span>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="flex-shrink:0;">
+        <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+    <div class="contact-hints">
+      <p class="hint-title">What to include in your email:</p>
+      <ul class="hint-list">
+        <li>Type of project — interior, exterior, or both</li>
+        <li>Floor plans, sketches, or 3D model if you have one</li>
+        <li>Reference images or mood board</li>
+        <li>Your timeline and deadline</li>
+      </ul>
     </div>
-    <div class="form-group">
-      <label>Project type</label>
-      <select name="service">
-        <option value="">Select a service</option>
-        <option>Interior render — $249</option>
-        <option>Exterior render — $349</option>
-        <option>Full project — $899</option>
-        <option>Render enhancement — $80</option>
-        <option>Material variation — $65</option>
-        <option>Custom / large project quote</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Tell us about your project</label>
-      <textarea name="message" placeholder="Describe the space, any references you have, and your timeline..."></textarea>
-    </div>
-    <div class="form-group">
-      <label>Attachments — floor plans, references, mood boards</label>
-      <div class="file-upload" id="fileUpload">
-        <input type="file" id="fileInput" name="attachments" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,.dwg,.dxf" style="display:none;">
-        <div class="file-upload-inner" onclick="document.getElementById('fileInput').click()">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin-bottom:0.5rem;opacity:0.4;">
-            <path d="M10 3v10M6 7l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M3 14v1a2 2 0 002 2h10a2 2 0 002-2v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          <p class="file-upload-text">Click to upload or drag and drop</p>
-          <p class="file-upload-hint">JPG, PNG, PDF, DWG up to 20MB each</p>
-        </div>
-        <div id="fileList" class="file-list"></div>
-      </div>
-    </div>
-    <button type="submit" class="form-submit">Send enquiry</button>
-  </form>
+  </div>
 </section>
 
 <!-- FOOTER -->
@@ -1670,47 +1593,6 @@ function loadMore() {
 })();
 </script>
 
-<script>
-(function() {
-  const input = document.getElementById('fileInput');
-  const list = document.getElementById('fileList');
-  const zone = document.getElementById('fileUpload');
-
-  let files = [];
-
-  function renderList() {
-    list.innerHTML = '';
-    files.forEach(function(f, i) {
-      const size = f.size > 1048576 ? (f.size/1048576).toFixed(1) + ' MB' : (f.size/1024).toFixed(0) + ' KB';
-      const item = document.createElement('div');
-      item.className = 'file-item';
-      item.innerHTML = '<span>' + f.name + '</span><span style="margin-left:1rem;font-size:0.7rem;">' + size + '</span><button class="file-remove" data-i="' + i + '">×</button>';
-      list.appendChild(item);
-    });
-    list.querySelectorAll('.file-remove').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        files.splice(parseInt(btn.dataset.i), 1);
-        renderList();
-      });
-    });
-  }
-
-  input.addEventListener('change', function() {
-    Array.from(input.files).forEach(function(f) { files.push(f); });
-    renderList();
-    input.value = '';
-  });
-
-  zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('dragover'); });
-  zone.addEventListener('dragleave', function() { zone.classList.remove('dragover'); });
-  zone.addEventListener('drop', function(e) {
-    e.preventDefault();
-    zone.classList.remove('dragover');
-    Array.from(e.dataTransfer.files).forEach(function(f) { files.push(f); });
-    renderList();
-  });
-})();
-</script>
 <script>
 (function() {
   const slider = document.getElementById('baSlider2');
